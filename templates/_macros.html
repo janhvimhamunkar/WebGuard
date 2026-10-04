@@ -1,0 +1,13 @@
+{% macro badge(status) %}<span class="wg-badge b-{{ status|lower }}">{{ status }}</span>{% endmacro %}
+{% macro finding(f) %}
+<div class="card wg-card mb-3 finding f-{{ f.status|lower }}"><div class="card-body">
+  <div class="d-flex justify-content-between flex-wrap gap-2">
+    <h6 class="mb-1">{{ f.name }}</h6>
+    <div>{{ badge(f.status) }} <span class="small text-secondary ms-1">Severity: {{ f.severity }}</span></div>
+  </div>
+  <p class="mb-1">{{ f.description }}</p>
+  <p class="small text-secondary mb-1"><b>Why it matters:</b> {{ f.why }}</p>
+  <p class="small text-secondary mb-1"><b>Remediation:</b> {{ f.recommendation }}</p>
+  {% if f.owasp %}<p class="small mb-0"><i class="bi bi-bookmark"></i> {{ f.owasp }}</p>{% endif %}
+</div></div>
+{% endmacro %}

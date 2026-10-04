@@ -1,0 +1,61 @@
+{% extends "base.html" %}{% from "_macros.html" import finding, badge %}{% block title %}Results - WebGuard{% endblock %}
+{% block content %}{% set s = scan.summary %}
+<div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-3">
+  <h2 class="mb-0">Scan Results</h2>
+  <a class="btn btn-outline-info" href="{{ url_for('report', scan_id=scan.scan_id) }}"><i class="bi bi-file-earmark-text"></i> Download PDF Report</a>
+</div>
+{% if scan.note %}<div class="alert wg-warn">{{ scan.note }}</div>{% endif %}
+<ul class="nav nav-tabs wg-tabs mb-3" role="tablist">
+{% for id, label in [("overview","Overview"),("headers","Security Headers"),("cookies","Cookie Security"),("tls","HTTPS/TLS"),("exposure","Information Exposure"),("html","HTML Analysis"),("all","All Findings")] %}
+<li class="nav-item"><button class="nav-link {{ 'active' if loop.first }}" data-bs-toggle="tab" data-bs-target="#t-{{ id }}">{{ label }}</button></li>{% endfor %}</ul>
+<div class="tab-content">
+<div class="tab-pane fade show active" id="t-overview">
+  <div class="row g-3 mb-3">
+    <div class="col-md-6"><div class="card wg-card text-center h-100"><div class="card-body">
+      <h5 class="text-secondary fw-bold mb-3">SECURITY SCORE</h5>
+      <div class="score-ring" data-score="{{ s.score }}"><div><span class="score-num">{{ s.score }}</span><small>/ 100</small></div></div>
+      <p class="mt-3 mb-1 text-secondary fw-bold">{{ s.rating }}</p>
+    </div></div></div>
+    <div class="col-md-6"><div class="card wg-card text-center h-100"><div class="card-body">
+      <h5 class="text-secondary fw-bold mb-3">RISK SCORE</h5>
+      <div class="score-ring" data-risk-score="{{ s.risk_score }}"><div><span class="score-num">{{ s.risk_score }}</span><small>/ 100</small></div></div>
+      <p class="mt-3 mb-1 text-secondary fw-bold">{{ s.risk_level }}</p>
+    </div></div></div>
+  </div>
+  <div class="card wg-card mb-3"><div class="card-body">
+    <p class="score-disclaimer text-center mb-0">The Risk Score represents the severity-weighted configuration issues detected by WebGuard. It is not a probability of compromise and does not replace a complete penetration test.</p>
+  </div></div>
+  <div class="card wg-card mb-3"><div class="card-body">
+    <h5 class="text-secondary fw-bold mb-3">Target Information</h5>
+    <dl class="row mb-0">
+      <dt class="col-sm-4">Target URL</dt><dd class="col-sm-8 text-break">{{ scan.target_url }}</dd>
+      <dt class="col-sm-4">Final URL</dt><dd class="col-sm-8 text-break">{{ scan.final_url }}</dd>
+      <dt class="col-sm-4">Scan Date</dt><dd class="col-sm-8">{{ scan.scan_date }}</dd>
+      <dt class="col-sm-4">Status Code</dt><dd class="col-sm-8">{{ scan.status_code }}</dd>
+      <dt class="col-sm-4">HTTPS</dt><dd class="col-sm-8">{% if scan.https %}<span class="text-success"><i class="bi bi-lock-fill"></i> Yes</span>{% else %}<span class="text-danger"><i class="bi bi-unlock-fill"></i> No</span>{% endif %}</dd>
+      <dt class="col-sm-4">Response Time</dt><dd class="col-sm-8">{{ scan.response_time_ms }} ms</dd>
+      {% if scan.redirect_information %}
+      <dt class="col-sm-4">Redirect Status</dt><dd class="col-sm-8">{{ scan.redirect_information.redirect_count }} redirect(s) {% if scan.redirect_information.redirect_count > 0 %}<small class="text-muted">({{ scan.redirect_information.redirect_chain | join(' &rarr; ') | safe }})</small>{% endif %}</dd>
+      {% endif %}
+    </dl></div></div>
+  <div class="col-12"><div class="row g-3 text-center">
+  {% for lbl, v, c in [("Critical",s.critical,"critical"),("High",s.high,"high"),("Medium",s.medium,"medium"),("Low",s.low,"low"),("Passed Checks",s.passed,"pass")] %}
+    <div class="col"><div class="card wg-card stat s-{{ c }}"><div class="card-body"><div class="stat-num">{{ v }}</div>{{ lbl }}</div></div></div>{% endfor %}
+  </div></div>
+</div>
+{% for cat, empty_msg in [("headers", "No security header issues were detected."), ("cookies", "No cookie security issues were detected in the analyzed response."), ("tls", "No specific HTTPS/TLS configuration issues were detected."), ("exposure", "No significant information exposure issues were detected."), ("html", "No specific HTML security issues were detected.")] %}
+<div class="tab-pane fade" id="t-{{ cat }}">
+  {% set cat_findings = scan.findings|selectattr("category","equalto",cat)|list %}
+  {% if not cat_findings %}
+    <p class="text-secondary mt-3">{{ empty_msg }}</p>
+  {% else %}
+    {% for f in cat_findings %}{{ finding(f) }}{% endfor %}
+  {% endif %}
+</div>
+{% endfor %}
+<div class="tab-pane fade" id="t-all">
+  {% for f in scan.findings %}{{ finding(f) }}{% endfor %}
+  <p class="small text-secondary mt-3">OWASP mappings are educational references and do not constitute complete vulnerability verification.</p>
+</div>
+</div>
+{% endblock %}

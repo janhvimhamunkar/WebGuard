@@ -1,0 +1,21 @@
+{% extends "base.html" %}{% block title %}Report - WebGuard{% endblock %}{% block content %}{% set s = scan.summary %}
+<div class="report">
+<div class="d-flex justify-content-between no-print mb-3"><a href="{{ url_for('dashboard', scan_id=scan.scan_id) }}" class="btn btn-outline-info">&larr; Dashboard</a>
+<button class="btn btn-wg" onclick="window.print()"><i class="bi bi-printer"></i> Print Report</button></div>
+<h1 class="h3">WEBGUARD SECURITY ASSESSMENT REPORT</h1><hr>
+<p><b>Target:</b> {{ scan.target_url }}<br><b>Scan Date:</b> {{ scan.scan_date }}<br><b>Security Score:</b> {{ s.score }} / 100 ({{ s.rating }})<br><b>Risk Score:</b> {{ s.risk_score }} / 100 ({{ s.risk_level }})</p>
+<h2 class="h5">Executive Summary</h2>
+<p>A passive assessment of {{ scan.target_url }} identified {{ s.total_findings }} potential security concern(s) and {{ s.passed }} passed check(s). The score is calculated from severity-weighted findings and does not represent a full penetration test. Manual verification may be required.</p>
+<h2 class="h5">Security Summary</h2>
+<table class="table table-sm"><tr><th>Critical</th><th>High</th><th>Medium</th><th>Low</th><th>Informational</th><th>Passed</th></tr>
+<tr><td>{{ s.critical }}</td><td>{{ s.high }}</td><td>{{ s.medium }}</td><td>{{ s.low }}</td><td>{{ s.info }}</td><td>{{ s.passed }}</td></tr></table>
+<h2 class="h5">Detailed Findings</h2>
+{% for f in scan.findings if f.severity != "Pass" %}
+<div class="rep-f"><h3 class="h6">{{ loop.index }}. {{ f.name }}</h3>
+<p class="mb-1"><b>Severity:</b> {{ f.severity }}</p><p class="mb-1"><b>Description:</b> {{ f.description }}</p>
+<p class="mb-1"><b>Evidence:</b> <code>{{ f.evidence }}</code></p><p class="mb-1"><b>Potential Impact:</b> {{ f.why }}</p>
+<p class="mb-1"><b>Recommended Remediation:</b> {{ f.recommendation }}</p><p class="mb-0"><b>OWASP Mapping:</b> {{ f.owasp or "N/A" }}</p></div>
+{% else %}<p>No issues detected by the implemented checks.</p>{% endfor %}
+<h2 class="h5 mt-4">Disclaimer</h2>
+<p class="small">This report was produced by an educational passive scanner. It checks only a limited set of HTTP/TLS configuration items and is not a complete vulnerability assessment. The Risk Score represents the severity-weighted configuration issues detected by WebGuard. It is not a probability of compromise and does not replace a complete penetration test. OWASP mappings are educational references and do not constitute complete vulnerability verification. Use only on authorized systems.</p>
+</div>{% endblock %}

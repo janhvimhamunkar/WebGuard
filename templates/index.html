@@ -1,0 +1,14 @@
+{% extends "base.html" %}{% block content %}
+<section class="text-center py-5">
+  <i class="bi bi-shield-lock hero-icon"></i>
+  <h1 class="display-3 fw-bold">Web<span class="accent">Guard</span></h1>
+  <p class="lead text-primary">Automated Web Application Security Assessment</p>
+  <p class="text-secondary mx-auto" style="max-width:640px">WebGuard performs passive, non-destructive security analysis of authorized web applications by examining publicly returned HTTP/HTTPS information.</p>
+  <a href="{{ url_for('scanner_page') }}" class="btn btn-wg btn-lg me-2">Start Security Scan</a>
+  <a href="{{ url_for('about') }}" class="btn btn-outline-primary btn-lg">Learn More</a>
+  <div class="alert wg-warn mx-auto mt-4" style="max-width:640px"><i class="bi bi-exclamation-triangle"></i> Only scan websites that you own or have explicit authorization to test.</div>
+</section>
+<div class="row g-3">
+{% for icon, t, d in [("shield-check","Security Header Analysis","Checks six key HTTP response headers."),("cookie","Cookie Security Analysis","Secure, HttpOnly and SameSite attributes."),("lock","HTTPS/TLS Analysis","Protocol, HTTPS use and certificate expiry."),("eye","Information Exposure Detection","Server and framework disclosure headers."),("bar-chart","Risk Classification","Severity levels and an explainable score."),("file-earmark-text","Security Reports","Printable HTML reports (PDF planned).")] %}
+<div class="col-md-6 col-lg-4"><div class="card wg-card h-100"><div class="card-body"><i class="bi bi-{{ icon }} feat-icon"></i><h5>{{ t }}</h5><p class="text-secondary mb-0">{{ d }}</p></div></div></div>
+{% endfor %}</div>{% endblock %}

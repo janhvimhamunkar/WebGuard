@@ -1,0 +1,10 @@
+{% extends "base.html" %}{% block title %}About - WebGuard{% endblock %}{% block content %}
+<div class="mx-auto" style="max-width:800px">
+{% if not_found %}<div class="alert alert-danger">Page or scan not found (404).</div>{% endif %}
+<h2>About WebGuard</h2>
+<p class="text-secondary">WebGuard is an educational, passive, non-destructive web security assessment platform built as a college cybersecurity project.</p>
+<div class="row g-3">
+<div class="col-md-6"><div class="card wg-card h-100"><div class="card-body"><h5 class="text-success"><i class="bi bi-check-circle"></i> What it checks</h5><ul class="mb-0"><li>URL validity, reachability, status, redirects, response time</li><li>Six security response headers</li><li>Cookie Secure / HttpOnly / SameSite attributes</li><li>HTTPS use, TLS version, certificate expiry</li><li>Server / X-Powered-By disclosure</li></ul></div></div></div>
+<div class="col-md-6"><div class="card wg-card h-100"><div class="card-body"><h5 class="text-danger"><i class="bi bi-x-circle"></i> What it does NOT check</h5><ul class="mb-0"><li>SQL injection, XSS or any exploitation</li><li>Brute force, credentials, DoS, directory brute forcing</li><li>Page content, JavaScript, forms, authenticated areas</li><li>Full OWASP Top 10 coverage</li></ul></div></div></div></div>
+<div class="alert wg-warn mt-4"><b>Authorized use policy:</b> only scan websites you own or have explicit permission to test. Private/loopback addresses are blocked by default.</div>
+<p class="text-secondary">Future development: PDF export, deeper TLS analysis, scheduled scans.</p></div>{% endblock %}

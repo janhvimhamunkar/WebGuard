@@ -1,0 +1,53 @@
+{% extends "base.html" %}{% block title %}History - WebGuard{% endblock %}{% block content %}
+<h2>Scan History</h2>
+<div class="card wg-card">
+    <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0">
+            <thead>
+                <tr>
+                    <th>Date</th>
+                    <th>Target</th>
+                    <th>Security Score</th>
+                    <th>Risk Score</th>
+                    <th>Findings</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for s in scans %}<tr>
+                    <td>{{ s.scan_date }}</td>
+                    <td class="text-break">{{ s.target_url }}</td>
+                    <td><span
+                            class="wg-badge {{ 'b-pass' if s.security_score >= 90 else 'b-info' if s.security_score >= 75 else 'b-warning' if s.security_score >= 50 else 'b-high' if s.security_score >= 25 else 'b-critical' }}">{{
+                            s.security_score }}</span></td>
+                    <td><span
+                            class="wg-badge {{ 'b-pass' if s.risk_score <= 10 else 'b-info' if s.risk_score <= 25 else 'b-warning' if s.risk_score <= 50 else 'b-high' if s.risk_score <= 75 else 'b-critical' }}">{{
+                            s.risk_score }}</span></td>
+                    <td>{{ s.total_findings }}</td>
+                    <td>
+                        <a class="btn btn-sm btn-outline-primary"
+                            href="{{ url_for('dashboard', scan_id=s.scan_id) }}">View</a>
+                        <button class="btn btn-sm btn-outline-danger ms-1"
+                            onclick="deleteScan({{ s.scan_id }})">Delete</button>
+                    </td>
+                </tr>
+                {% else %}<tr>
+                    <td colspan="6" class="text-center text-secondary py-4">No scans yet. <a
+                            href="{{ url_for('scanner_page') }}">Run your first scan</a>.</td>
+                </tr>{% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+<script>
+    function deleteScan(scanId) {
+        if (confirm("Are you sure you want to delete this scan?")) {
+            fetch(`/delete/${scanId}`, { method: 'POST' })
+                .then(response => {
+                    if (response.ok) { window.location.reload(); }
+                    else { alert("Failed to delete scan."); }
+                });
+        }
+    }
+</script>
+{% endblock %}
